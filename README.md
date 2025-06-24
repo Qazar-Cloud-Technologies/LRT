@@ -361,7 +361,7 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE.md](LICENSE.md) pour pl
 
 ### 📧 Contact
 
-- **Email** : support@sahq-theme.com
+- **Email** : adminms@makesocial.me
 - **GitHub** : [@Mandroso22](https://github.com/Mandroso22)
 
 ---
