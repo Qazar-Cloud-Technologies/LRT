@@ -3,7 +3,7 @@
   Supports: image background, video background, overlay text, CTA buttons
 {% endcomment %}
 
-<section class="hero hero--{{ section.settings.layout }} hero--{{ section.settings.text_alignment }} hero--{{ section.settings.height }}" 
+<section class="hero full-width hero--{{ section.settings.layout }} hero--{{ section.settings.text_alignment }} hero--{{ section.settings.height }} hero--text-{{ section.settings.text_color_scheme }}" 
          style="--hero-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};">
   
   {% if section.settings.background_video != blank %}
@@ -68,7 +68,7 @@
     justify-content: center;
     overflow: hidden;
     width: 100%;
-    margin-top: 4rem;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.1);
   }
 
   .hero--full-height {
@@ -141,13 +141,54 @@
     text-align: right;
   }
 
+  /* Text color schemes */
+  .hero--text-light .hero__subtitle,
+  .hero--text-light .hero__heading,
+  .hero--text-light .hero__description {
+    color: white;
+  }
+
+  .hero--text-dark .hero__subtitle,
+  .hero--text-dark .hero__heading,
+  .hero--text-dark .hero__description {
+    color: var(--color-foreground);
+  }
+
+  .hero--text-accent .hero__subtitle,
+  .hero--text-accent .hero__heading,
+  .hero--text-accent .hero__description {
+    color: var(--color-accent);
+  }
+
+  .hero--text-custom .hero__subtitle,
+  .hero--text-custom .hero__heading,
+  .hero--text-custom .hero__description {
+    color: var(--custom-text-color);
+  }
+
   .hero__subtitle {
     font-size: 1.125rem;
     font-weight: 500;
-    color: var(--color-accent);
     margin-bottom: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  .hero--text-light .hero__subtitle {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .hero--text-dark .hero__subtitle {
+    color: var(--color-accent);
+  }
+
+  .hero--text-accent .hero__subtitle {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .hero--text-custom .hero__subtitle {
+    color: var(--custom-text-color);
+    opacity: 0.9;
   }
 
   .hero__heading {
@@ -155,14 +196,12 @@
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: 1.5rem;
-    color: var(--color-foreground);
   }
 
   .hero__description {
     font-size: 1.25rem;
     line-height: 1.6;
     margin-bottom: 2rem;
-    color: var(--color-foreground);
     opacity: 0.9;
   }
 
@@ -204,12 +243,48 @@
 
   .hero__button--secondary {
     background-color: transparent;
-    color: var(--color-foreground);
-    border: 2px solid var(--color-foreground);
+    border: 2px solid;
+    transition: all 0.3s ease;
   }
 
-  .hero__button--secondary:hover {
+  /* Secondary button colors based on text scheme */
+  .hero--text-light .hero__button--secondary {
+    border-color: white;
+    color: white;
+  }
+
+  .hero--text-light .hero__button--secondary:hover {
+    background-color: white;
+    color: var(--color-foreground);
+  }
+
+  .hero--text-dark .hero__button--secondary {
+    border-color: var(--color-foreground);
+    color: var(--color-foreground);
+  }
+
+  .hero--text-dark .hero__button--secondary:hover {
     background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+
+  .hero--text-accent .hero__button--secondary {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .hero--text-accent .hero__button--secondary:hover {
+    background-color: var(--color-accent);
+    color: white;
+  }
+
+  .hero--text-custom .hero__button--secondary {
+    border-color: var(--custom-text-color);
+    color: var(--custom-text-color);
+  }
+
+  .hero--text-custom .hero__button--secondary:hover {
+    background-color: var(--custom-text-color);
     color: var(--color-background);
   }
 
@@ -366,6 +441,36 @@
         }
       ],
       "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_color_scheme",
+      "label": "Text color scheme",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light text (dark backgrounds)"
+        },
+        {
+          "value": "dark",
+          "label": "Dark text (light backgrounds)"
+        },
+        {
+          "value": "accent",
+          "label": "Accent color"
+        },
+        {
+          "value": "custom",
+          "label": "Custom color"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "color",
+      "id": "custom_text_color",
+      "label": "Custom text color",
+      "info": "Only applies when 'Custom color' is selected above"
     }
   ],
   "presets": [

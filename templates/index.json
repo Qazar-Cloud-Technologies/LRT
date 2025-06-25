@@ -1,5 +1,23 @@
 {
   "sections": {
+    "banner": {
+      "type": "banner",
+      "settings": {
+        "show_banner": true,
+        "text": "🎉 Free shipping on orders over $50 ! Limited time offer.",
+        "show_icon": true,
+        "link": "/collections/all",
+        "link_text": "Shop Now"
+      }
+    },
+    "hello-world": {
+      "type": "hello-world",
+      "settings": {}
+    },
+    "collections": {
+      "type": "collections",
+      "settings": {}
+    },
     "hero": {
       "type": "hero",
       "settings": {
@@ -16,10 +34,28 @@
         "text_alignment": "center"
       }
     },
-    "hello-world": {
-      "type": "hello-world",
-      "settings": {}
+    "grid-product": {
+      "type": "grid-product",
+      "settings": {
+        "show_section": true,
+        "title": "Our Gallery"
+      },
+      "blocks": {
+        "image-1": {
+          "type": "image"
+        },
+        "image-2": {
+          "type": "image"
+        },
+        "image-3": {
+          "type": "image"
+        },
+        "image-4": {
+          "type": "image"
+        }
+      },
+      "block_order": ["image-1", "image-2", "image-3", "image-4"]
     }
   },
-  "order": ["hello-world", "hero"]
+  "order": ["banner", "hero", "collections", "hello-world", "grid-product"]
 }
