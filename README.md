@@ -1,4 +1,4 @@
-# 🚀 Sahq - Shopify Theme
+# 🚀 Sahq - Shopify Theme (CURRENTLY ON BUILD)
 
 Un thème Shopify moderne et flexible, conçu pour offrir une expérience e-commerce exceptionnelle avec une personnalisation poussée.
 
