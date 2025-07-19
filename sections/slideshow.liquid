@@ -1,59 +1,87 @@
 {% comment %}
-  Slideshow Section - Multi-slide carousel with animations and responsive design
+  Slideshow Section with Tailwind CSS - Multi-slide carousel with animations
   Supports: multiple slides, text overlays, animation effects, auto-play, navigation
+  This version uses primarily Tailwind CSS classes for styling
 {% endcomment %}
 
-<section class="slideshow full-width slideshow--{{ section.settings.height }} slideshow--text-{{ section.settings.text_color_scheme }}" 
+<section class="relative w-full overflow-hidden {{ section.settings.height_class }}" 
+         data-slideshow
          data-autoplay="{{ section.settings.autoplay }}"
-         data-autoplay-speed="{{ section.settings.autoplay_speed }}"
-         style="--slideshow-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};">
+         data-autoplay-speed="{{ section.settings.autoplay_speed }}">
   
-  <div class="slideshow__container">
-    <div class="slideshow__slides-wrapper">
+  <div class="relative w-full h-full">
+    <!-- Slides Container -->
+    <div class="relative w-full h-full" data-slides-container>
       {% for block in section.blocks %}
-        <div class="slideshow__slide {% if forloop.first %}slideshow__slide--active{% endif %}" 
-             data-slide-index="{{ forloop.index0 }}"
+        <div class="absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out {% if forloop.first %}opacity-100 visible z-10{% else %}opacity-0 invisible z-0{% endif %}" 
+             data-slide="{{ forloop.index0 }}"
              {{ block.shopify_attributes }}>
           
+          <!-- Slide Image -->
           {% if block.settings.image != blank %}
-            <div class="slideshow__image-container">
+            <div class="absolute inset-0 w-full h-full">
               {% render 'image', 
                 image: block.settings.image,
-                class: 'slideshow__image',
+                class: 'w-full h-full object-cover',
                 sizes: '100vw',
                 loading: forloop.first ? 'eager' : 'lazy'
               %}
+              <!-- Ken Burns Animation -->
+              <div class="absolute inset-0 w-full h-full {% if forloop.first %}ken-burns{% endif %}"></div>
             </div>
           {% endif %}
 
-          {% if section.settings.overlay_color != blank %}
-            <div class="slideshow__overlay" style="background-color: {{ section.settings.overlay_color }};"></div>
+          <!-- Overlay -->
+          {% if section.settings.enable_overlay %}
+            <div class="absolute inset-0 bg-black opacity-{{ section.settings.overlay_opacity }}"></div>
           {% endif %}
 
-          <div class="slideshow__content slideshow__content--{{ block.settings.text_alignment }}">
-            <div class="slideshow__text-container">
+          <!-- Content -->
+          <div class="relative h-full flex items-center justify-{{ block.settings.content_position }} px-4 md:px-8 lg:px-12">
+            <div class="max-w-4xl mx-auto text-{{ block.settings.text_alignment }} space-y-4 md:space-y-6">
+              <!-- Subtitle -->
               {% if block.settings.subtitle != blank %}
-                <p class="slideshow__subtitle">{{ block.settings.subtitle }}</p>
+                <p class="text-sm md:text-base lg:text-lg font-medium tracking-wider uppercase opacity-0 translate-y-5 
+                         {% if forloop.first %}fade-in animation-delay-200{% endif %}
+                         {{ section.settings.text_color_class }}">
+                  {{ block.settings.subtitle }}
+                </p>
               {% endif %}
               
+              <!-- Heading -->
               {% if block.settings.heading != blank %}
-                <h2 class="slideshow__heading">{{ block.settings.heading }}</h2>
+                <h2 class="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight opacity-0 translate-y-5
+                          {% if forloop.first %}fade-in animation-delay-300{% endif %}
+                          {{ section.settings.text_color_class }}">
+                  {{ block.settings.heading }}
+                </h2>
               {% endif %}
               
+              <!-- Description -->
               {% if block.settings.description != blank %}
-                <div class="slideshow__description">{{ block.settings.description }}</div>
+                <div class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto opacity-0 translate-y-5
+                           {% if forloop.first %}fade-in animation-delay-400{% endif %}
+                           {{ section.settings.text_color_class }}">
+                  {{ block.settings.description }}
+                </div>
               {% endif %}
               
+              <!-- Buttons -->
               {% if block.settings.button_text != blank and block.settings.button_link != blank %}
-                <div class="slideshow__buttons">
+                <div class="flex flex-col sm:flex-row gap-4 {% if block.settings.text_alignment == 'center' %}justify-center{% elsif block.settings.text_alignment == 'right' %}justify-end{% endif %} 
+                           opacity-0 translate-y-5 {% if forloop.first %}fade-in animation-delay-500{% endif %}">
                   <a href="{{ block.settings.button_link }}" 
-                     class="slideshow__button slideshow__button--primary">
+                     class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg
+                            transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg
+                            {{ block.settings.button_style_class }}">
                     {{ block.settings.button_text }}
                   </a>
                   
                   {% if block.settings.secondary_button_text != blank and block.settings.secondary_button_link != blank %}
                     <a href="{{ block.settings.secondary_button_link }}" 
-                       class="slideshow__button slideshow__button--secondary">
+                       class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg
+                              border-2 transition-all duration-300 transform hover:-translate-y-1
+                              {{ block.settings.secondary_button_style_class }}">
                       {{ block.settings.secondary_button_text }}
                     </a>
                   {% endif %}
@@ -67,22 +95,34 @@
 
     {% if section.blocks.size > 1 %}
       <!-- Navigation Arrows -->
-      <button class="slideshow__nav slideshow__nav--prev" aria-label="Previous slide">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 18l-6-6 6-6" />
+      <button class="absolute top-1/2 left-4 md:left-8 -translate-y-1/2 z-20 
+                     w-12 h-12 bg-white/80 hover:bg-white rounded-full 
+                     flex items-center justify-center transition-all duration-300
+                     hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              data-slide-prev
+              aria-label="Previous slide">
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
-      <button class="slideshow__nav slideshow__nav--next" aria-label="Next slide">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 18l6-6-6-6" />
+      
+      <button class="absolute top-1/2 right-4 md:right-8 -translate-y-1/2 z-20 
+                     w-12 h-12 bg-white/80 hover:bg-white rounded-full 
+                     flex items-center justify-center transition-all duration-300
+                     hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              data-slide-next
+              aria-label="Next slide">
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
       <!-- Dots Navigation -->
-      <div class="slideshow__dots">
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2" data-dots-container>
         {% for block in section.blocks %}
-          <button class="slideshow__dot {% if forloop.first %}slideshow__dot--active{% endif %}" 
-                  data-slide-index="{{ forloop.index0 }}"
+          <button class="w-3 h-3 rounded-full transition-all duration-300 
+                         {% if forloop.first %}bg-white w-8{% else %}bg-white/50 hover:bg-white/75{% endif %}"
+                  data-slide-dot="{{ forloop.index0 }}"
                   aria-label="Go to slide {{ forloop.index }}">
           </button>
         {% endfor %}
@@ -91,481 +131,169 @@
   </div>
 </section>
 
-{% stylesheet %}
-  .slideshow {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
+<style>
+  /* Custom height classes that can't be done with Tailwind */
+  .h-screen-80 {
+    height: 80vh;
   }
-
-  .slideshow--full-height {
-    min-height: 100vh;
+  
+  .h-screen-60 {
+    height: 60vh;
   }
-
-  .slideshow--large {
-    min-height: 80vh;
+  
+  .h-screen-40 {
+    height: 40vh;
   }
-
-  .slideshow--medium {
-    min-height: 60vh;
-  }
-
-  .slideshow--small {
-    min-height: 40vh;
-  }
-
-  .slideshow__container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .slideshow__slides-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .slideshow__slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 1s ease, visibility 1s ease, transform 1s ease;
-    transform: scale(1.05);
-  }
-
-  .slideshow__slide--active {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
-  }
-
-  /* Ken Burns effect animation */
-  @keyframes kenBurns {
-    0% {
-      transform: scale(1) translate(0, 0);
-    }
-    100% {
-      transform: scale(1.1) translate(-2%, -2%);
-    }
-  }
-
-  .slideshow__slide--active .slideshow__image {
-    animation: kenBurns 10s ease-out infinite alternate;
-  }
-
-  .slideshow__image-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-  }
-
-  .slideshow__image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .slideshow__overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-    opacity: var(--slideshow-overlay-opacity);
-  }
-
-  .slideshow__content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    padding: 2rem var(--page-margin);
-  }
-
-  .slideshow__content--center {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .slideshow__content--left {
-    justify-content: flex-start;
-    text-align: left;
-  }
-
-  .slideshow__content--right {
-    justify-content: flex-end;
-    text-align: right;
-  }
-
-  .slideshow__text-container {
-    max-width: 800px;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
-  }
-
-  .slideshow__slide--active .slideshow__text-container {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Text color schemes */
-  .slideshow--text-light .slideshow__subtitle,
-  .slideshow--text-light .slideshow__heading,
-  .slideshow--text-light .slideshow__description {
-    color: white;
-  }
-
-  .slideshow--text-dark .slideshow__subtitle,
-  .slideshow--text-dark .slideshow__heading,
-  .slideshow--text-dark .slideshow__description {
-    color: var(--color-foreground);
-  }
-
-  .slideshow--text-accent .slideshow__subtitle,
-  .slideshow--text-accent .slideshow__heading,
-  .slideshow--text-accent .slideshow__description {
-    color: var(--color-accent);
-  }
-
-  .slideshow__subtitle {
-    font-size: 1.125rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
-  }
-
-  .slideshow__slide--active .slideshow__subtitle {
-    opacity: 0.9;
-    transform: translateY(0);
-  }
-
-  .slideshow__heading {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 700;
-    line-height: 1.1;
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
-  }
-
-  .slideshow__slide--active .slideshow__heading {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .slideshow__description {
-    font-size: 1.25rem;
-    line-height: 1.6;
-    margin-bottom: 2rem;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.6s, transform 0.8s ease 0.6s;
-  }
-
-  .slideshow__slide--active .slideshow__description {
-    opacity: 0.9;
-    transform: translateY(0);
-  }
-
-  .slideshow__buttons {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.7s, transform 0.8s ease 0.7s;
-  }
-
-  .slideshow__slide--active .slideshow__buttons {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .slideshow__content--center .slideshow__buttons {
-    justify-content: center;
-  }
-
-  .slideshow__content--right .slideshow__buttons {
-    justify-content: flex-end;
-  }
-
-  .slideshow__button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 2rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    min-height: 3rem;
-  }
-
-  .slideshow__button--primary {
-    background-color: var(--color-accent);
-    color: white;
-  }
-
-  .slideshow__button--primary:hover {
-    background-color: var(--color-accent-dark);
-    transform: translateY(-2px);
-  }
-
-  .slideshow__button--secondary {
-    background-color: transparent;
-    border: 2px solid;
-    transition: all 0.3s ease;
-  }
-
-  /* Secondary button colors based on text scheme */
-  .slideshow--text-light .slideshow__button--secondary {
-    border-color: white;
-    color: white;
-  }
-
-  .slideshow--text-light .slideshow__button--secondary:hover {
-    background-color: white;
-    color: var(--color-foreground);
-  }
-
-  .slideshow--text-dark .slideshow__button--secondary {
-    border-color: var(--color-foreground);
-    color: var(--color-foreground);
-  }
-
-  .slideshow--text-dark .slideshow__button--secondary:hover {
-    background-color: var(--color-foreground);
-    color: var(--color-background);
-  }
-
-  .slideshow--text-accent .slideshow__button--secondary {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-
-  .slideshow--text-accent .slideshow__button--secondary:hover {
-    background-color: var(--color-accent);
-    color: white;
-  }
-
-  /* Navigation */
-  .slideshow__nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 4;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: none;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0.8;
-  }
-
-  .slideshow__nav:hover {
-    opacity: 1;
-    transform: translateY(-50%) scale(1.1);
-  }
-
-  .slideshow__nav--prev {
-    left: 2rem;
-  }
-
-  .slideshow__nav--next {
-    right: 2rem;
-  }
-
-  .slideshow__nav svg {
-    width: 24px;
-    height: 24px;
-    color: var(--color-foreground);
-  }
-
-  /* Dots Navigation */
-  .slideshow__dots {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .slideshow__dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .slideshow__dot:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.2);
-  }
-
-  .slideshow__dot--active {
-    background-color: white;
-    width: 32px;
-    border-radius: 6px;
-  }
-
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .slideshow__content {
-      padding: 1.5rem var(--page-margin);
-    }
-
-    .slideshow__nav {
-      width: 40px;
-      height: 40px;
-    }
-
-    .slideshow__nav--prev {
-      left: 1rem;
-    }
-
-    .slideshow__nav--next {
-      right: 1rem;
-    }
-
-    .slideshow__heading {
-      font-size: clamp(2rem, 6vw, 3rem);
-    }
-
-    .slideshow__description {
-      font-size: 1.125rem;
-    }
-
-    .slideshow__buttons {
-      flex-direction: column;
-      width: 100%;
-    }
-
-    .slideshow__button {
-      width: 100%;
-    }
-
-    .slideshow__dots {
-      bottom: 1rem;
-    }
-  }
-{% endstylesheet %}
+</style>
 
 {% javascript %}
-  document.addEventListener('DOMContentLoaded', function() {
-    const slideshows = document.querySelectorAll('.slideshow');
+  class Slideshow {
+    constructor(element) {
+      this.element = element;
+      this.slides = element.querySelectorAll('[data-slide]');
+      this.dots = element.querySelectorAll('[data-slide-dot]');
+      this.prevBtn = element.querySelector('[data-slide-prev]');
+      this.nextBtn = element.querySelector('[data-slide-next]');
+      this.currentSlide = 0;
+      this.autoplay = element.dataset.autoplay === 'true';
+      this.autoplaySpeed = parseInt(element.dataset.autoplaySpeed) || 5000;
+      this.autoplayInterval = null;
+      
+      this.init();
+    }
     
-    slideshows.forEach(slideshow => {
-      const slides = slideshow.querySelectorAll('.slideshow__slide');
-      const dots = slideshow.querySelectorAll('.slideshow__dot');
-      const prevBtn = slideshow.querySelector('.slideshow__nav--prev');
-      const nextBtn = slideshow.querySelector('.slideshow__nav--next');
+    init() {
+      if (this.slides.length <= 1) return;
       
-      let currentSlide = 0;
-      let autoplayInterval;
+      // Setup event listeners
+      this.prevBtn?.addEventListener('click', () => this.prevSlide());
+      this.nextBtn?.addEventListener('click', () => this.nextSlide());
       
-      const autoplay = slideshow.dataset.autoplay === 'true';
-      const autoplaySpeed = parseInt(slideshow.dataset.autoplaySpeed) || 5000;
-      
-      function showSlide(index) {
-        // Hide all slides
-        slides.forEach((slide, i) => {
-          slide.classList.remove('slideshow__slide--active');
-          if (dots[i]) dots[i].classList.remove('slideshow__dot--active');
-        });
-        
-        // Show current slide
-        slides[index].classList.add('slideshow__slide--active');
-        if (dots[index]) dots[index].classList.add('slideshow__dot--active');
-        
-        currentSlide = index;
-      }
-      
-      function nextSlide() {
-        const next = (currentSlide + 1) % slides.length;
-        showSlide(next);
-      }
-      
-      function prevSlide() {
-        const prev = (currentSlide - 1 + slides.length) % slides.length;
-        showSlide(prev);
-      }
-      
-      // Setup navigation
-      if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-      if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-      
-      // Setup dot navigation
-      dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => showSlide(index));
+      this.dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => this.goToSlide(index));
       });
       
       // Setup autoplay
-      if (autoplay && slides.length > 1) {
-        autoplayInterval = setInterval(nextSlide, autoplaySpeed);
+      if (this.autoplay) {
+        this.startAutoplay();
         
-        // Pause on hover
-        slideshow.addEventListener('mouseenter', () => {
-          clearInterval(autoplayInterval);
-        });
-        
-        slideshow.addEventListener('mouseleave', () => {
-          autoplayInterval = setInterval(nextSlide, autoplaySpeed);
-        });
+        this.element.addEventListener('mouseenter', () => this.stopAutoplay());
+        this.element.addEventListener('mouseleave', () => this.startAutoplay());
       }
       
-      // Touch/swipe support
+      // Setup touch support
+      this.setupTouchSupport();
+    }
+    
+    goToSlide(index) {
+      // Remove active states
+      this.slides.forEach((slide, i) => {
+        slide.classList.remove('opacity-100', 'visible', 'z-10');
+        slide.classList.add('opacity-0', 'invisible', 'z-0');
+        
+        // Remove animations from slide content
+        const animatedElements = slide.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .slide-in-up');
+        animatedElements.forEach(el => {
+          el.classList.remove('fade-in', 'slide-in-left', 'slide-in-right', 'slide-in-up');
+        });
+        
+        // Remove ken burns from images
+        const kenBurnsElements = slide.querySelectorAll('.ken-burns');
+        kenBurnsElements.forEach(el => el.classList.remove('ken-burns'));
+      });
+      
+      this.dots.forEach((dot, i) => {
+        dot.classList.remove('bg-white', 'w-8');
+        dot.classList.add('bg-white/50', 'w-3');
+      });
+      
+      // Add active states
+      this.slides[index].classList.remove('opacity-0', 'invisible', 'z-0');
+      this.slides[index].classList.add('opacity-100', 'visible', 'z-10');
+      
+      this.dots[index].classList.remove('bg-white/50', 'w-3');
+      this.dots[index].classList.add('bg-white', 'w-8');
+      
+      // Re-add animations to new slide
+      setTimeout(() => {
+        const newSlide = this.slides[index];
+        newSlide.querySelectorAll('[class*="animation-delay"]').forEach(el => {
+          el.classList.add('fade-in');
+        });
+        
+        const kenBurnsElements = newSlide.querySelectorAll('.absolute.inset-0:not(.bg-black)');
+        kenBurnsElements.forEach(el => {
+          if (el.previousElementSibling?.tagName === 'IMG') {
+            el.classList.add('ken-burns');
+          }
+        });
+      }, 50);
+      
+      this.currentSlide = index;
+    }
+    
+    nextSlide() {
+      const next = (this.currentSlide + 1) % this.slides.length;
+      this.goToSlide(next);
+    }
+    
+    prevSlide() {
+      const prev = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+      this.goToSlide(prev);
+    }
+    
+    startAutoplay() {
+      this.stopAutoplay();
+      this.autoplayInterval = setInterval(() => this.nextSlide(), this.autoplaySpeed);
+    }
+    
+    stopAutoplay() {
+      if (this.autoplayInterval) {
+        clearInterval(this.autoplayInterval);
+        this.autoplayInterval = null;
+      }
+    }
+    
+    setupTouchSupport() {
       let touchStartX = 0;
       let touchEndX = 0;
       
-      slideshow.addEventListener('touchstart', e => {
+      this.element.addEventListener('touchstart', e => {
         touchStartX = e.changedTouches[0].screenX;
-      });
+      }, { passive: true });
       
-      slideshow.addEventListener('touchend', e => {
+      this.element.addEventListener('touchend', e => {
         touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      });
+        this.handleSwipe();
+      }, { passive: true });
       
-      function handleSwipe() {
-        if (touchEndX < touchStartX - 50) nextSlide();
-        if (touchEndX > touchStartX + 50) prevSlide();
-      }
-    });
+      const handleSwipe = () => {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+          if (diff > 0) {
+            this.nextSlide();
+          } else {
+            this.prevSlide();
+          }
+        }
+      };
+      
+      this.handleSwipe = handleSwipe;
+    }
+  }
+  
+  // Initialize all slideshows on page
+  document.addEventListener('DOMContentLoaded', () => {
+    const slideshows = document.querySelectorAll('[data-slideshow]');
+    slideshows.forEach(slideshow => new Slideshow(slideshow));
   });
 {% endjavascript %}
 
 {% schema %}
 {
-  "name": "Slideshow",
+  "name": "Slideshow (Tailwind)",
   "tag": "section",
   "class": "section",
   "max_blocks": 5,
@@ -584,71 +312,93 @@
       "type": "range",
       "id": "autoplay_speed",
       "min": 3000,
-      "max": 10000,
+      "max": 9000,
       "step": 1000,
       "unit": "ms",
       "label": "Auto-play speed",
       "default": 5000
     },
     {
-      "type": "color",
-      "id": "overlay_color",
-      "label": "Overlay color",
-      "default": "#000000"
-    },
-    {
-      "type": "range",
-      "id": "overlay_opacity",
-      "min": 0,
-      "max": 80,
-      "step": 5,
-      "unit": "%",
-      "label": "Overlay opacity",
-      "default": 30
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "Enable overlay",
+      "default": true
     },
     {
       "type": "select",
-      "id": "height",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "options": [
+        {
+          "value": "10",
+          "label": "10%"
+        },
+        {
+          "value": "20",
+          "label": "20%"
+        },
+        {
+          "value": "30",
+          "label": "30%"
+        },
+        {
+          "value": "40",
+          "label": "40%"
+        },
+        {
+          "value": "50",
+          "label": "50%"
+        },
+        {
+          "value": "60",
+          "label": "60%"
+        }
+      ],
+      "default": "30"
+    },
+    {
+      "type": "select",
+      "id": "height_class",
       "label": "Section height",
       "options": [
         {
-          "value": "full-height",
+          "value": "h-screen",
           "label": "Full screen"
         },
         {
-          "value": "large",
+          "value": "h-screen-80",
           "label": "Large (80vh)"
         },
         {
-          "value": "medium",
+          "value": "h-screen-60",
           "label": "Medium (60vh)"
         },
         {
-          "value": "small",
+          "value": "h-screen-40",
           "label": "Small (40vh)"
         }
       ],
-      "default": "large"
+      "default": "h-screen-80"
     },
     {
       "type": "select",
-      "id": "text_color_scheme",
-      "label": "Text color scheme",
+      "id": "text_color_class",
+      "label": "Text color",
       "options": [
         {
-          "value": "light",
-          "label": "Light text (dark backgrounds)"
+          "value": "text-white",
+          "label": "White"
         },
         {
-          "value": "dark",
-          "label": "Dark text (light backgrounds)"
+          "value": "text-gray-900",
+          "label": "Dark"
         },
         {
-          "value": "accent",
-          "label": "Accent color"
+          "value": "text-gray-100",
+          "label": "Light Gray"
         }
       ],
-      "default": "light"
+      "default": "text-white"
     }
   ],
   "blocks": [
@@ -671,13 +421,13 @@
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "Slide Heading"
+          "default": "Discover Amazing Products"
         },
         {
           "type": "richtext",
           "id": "description",
           "label": "Description",
-          "default": "<p>Add a description for this slide</p>"
+          "default": "<p>Add a compelling description for this slide</p>"
         },
         {
           "type": "select",
@@ -700,6 +450,26 @@
           "default": "center"
         },
         {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "end",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
           "type": "header",
           "content": "Buttons"
         },
@@ -715,6 +485,30 @@
           "label": "Button link"
         },
         {
+          "type": "select",
+          "id": "button_style_class",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "bg-white text-gray-900 hover:bg-gray-100",
+              "label": "White"
+            },
+            {
+              "value": "bg-gray-900 text-white hover:bg-gray-800",
+              "label": "Dark"
+            },
+            {
+              "value": "bg-blue-600 text-white hover:bg-blue-700",
+              "label": "Blue"
+            },
+            {
+              "value": "bg-green-600 text-white hover:bg-green-700",
+              "label": "Green"
+            }
+          ],
+          "default": "bg-white text-gray-900 hover:bg-gray-100"
+        },
+        {
           "type": "text",
           "id": "secondary_button_text",
           "label": "Secondary button text"
@@ -723,14 +517,37 @@
           "type": "url",
           "id": "secondary_button_link",
           "label": "Secondary button link"
+        },
+        {
+          "type": "select",
+          "id": "secondary_button_style_class",
+          "label": "Secondary button style",
+          "options": [
+            {
+              "value": "border-white text-white hover:bg-white",
+              "label": "White outline"
+            },
+            {
+              "value": "border-gray-900 text-gray-900 hover:bg-gray-900",
+              "label": "Dark outline"
+            },
+            {
+              "value": "border-blue-600 text-blue-600 hover:bg-blue-600",
+              "label": "Blue outline"
+            }
+          ],
+          "default": "border-white text-white hover:bg-white"
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "Slideshow",
+      "name": "Slideshow (Tailwind)",
       "blocks": [
+        {
+          "type": "slide"
+        },
         {
           "type": "slide"
         },
