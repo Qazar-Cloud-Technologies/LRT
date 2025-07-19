@@ -1,82 +1,414 @@
-<header>
-  <div class="header__menu">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
+<header class="header {% if section.settings.sticky_header %}sticky-header{% endif %}" data-header>
+  <div class="header__container {% if section.settings.full_width %}w-full{% else %}container mx-auto{% endif %} px-4">
+    <div class="header__wrapper flex items-center justify-between h-16 md:h-20">
+      
+      <!-- Mobile Menu Button -->
+      <button class="header__mobile-toggle md:hidden p-2" aria-label="Open menu" data-mobile-menu-toggle>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+      
+      <!-- Logo/Title -->
+      <div class="header__logo flex-shrink-0">
+        {% if section.settings.logo %}
+          <a href="{{ routes.root_url }}" class="block">
+            <img src="{{ section.settings.logo | img_url: '200x' }}"
+                 alt="{{ shop.name }}"
+                 class="h-10 md:h-12 w-auto">
+          </a>
+        {% else %}
+          <h1 class="text-xl md:text-2xl font-bold">
+            <a href="{{ routes.root_url }}" class="text-gray-900 hover:text-gray-700 transition-colors">
+              {{ shop.name }}
+            </a>
+          </h1>
+        {% endif %}
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <nav class="header__menu hidden md:flex items-center space-x-1" data-desktop-menu>
+        {% for link in section.settings.menu.links %}
+          <div class="relative group" data-menu-item>
+            <a href="{{ link.url }}" 
+               class="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center group"
+               {% if link.links.size > 0 %}data-has-dropdown="true"{% endif %}>
+              {{ link.title }}
+              {% if link.links.size > 0 %}
+                <svg class="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              {% endif %}
+            </a>
+            
+            {% if link.links.size > 0 %}
+              <!-- Mega Menu Dropdown -->
+              <div class="mega-menu absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                <div class="bg-white rounded-lg shadow-xl border border-gray-200 p-6 min-w-[300px]">
+                  {% if link.links.size > 6 %}
+                    <!-- Multi-column layout for many items -->
+                    <div class="grid grid-cols-2 gap-6">
+                      {% for column in (1..2) %}
+                        <div>
+                          {% assign start_index = forloop.index0 | times: link.links.size | divided_by: 2 %}
+                          {% assign end_index = forloop.index | times: link.links.size | divided_by: 2 %}
+                          
+                          {% for childlink in link.links %}
+                            {% if forloop.index0 >= start_index and forloop.index0 < end_index %}
+                              <a href="{{ childlink.url }}" 
+                                 class="block py-2 px-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors">
+                                {{ childlink.title }}
+                              </a>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <!-- Single column for fewer items -->
+                    <div class="space-y-1">
+                      {% for childlink in link.links %}
+                        <a href="{{ childlink.url }}" 
+                           class="block py-2 px-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors">
+                          {{ childlink.title }}
+                        </a>
+                        
+                        {% if childlink.links.size > 0 %}
+                          <div class="ml-4 space-y-1">
+                            {% for grandchildlink in childlink.links %}
+                              <a href="{{ grandchildlink.url }}" 
+                                 class="block py-1 px-3 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md transition-colors">
+                                {{ grandchildlink.title }}
+                              </a>
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  
+                  {% if section.settings.show_featured_in_menu and link.title == 'Shop' %}
+                    <!-- Featured Products Section -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                      <h3 class="text-sm font-semibold text-gray-900 mb-3">Featured Products</h3>
+                      <div class="grid grid-cols-2 gap-4">
+                        {% for product in collections.all.products limit: 2 %}
+                          <a href="{{ product.url }}" class="group">
+                            <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 mb-2">
+                              <img src="{{ product.featured_image | img_url: '200x200' }}"
+                                   alt="{{ product.title }}"
+                                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            </div>
+                            <h4 class="text-sm text-gray-900 group-hover:text-blue-600 transition-colors">{{ product.title | truncate: 20 }}</h4>
+                            <p class="text-sm text-gray-600">{{ product.price | money }}</p>
+                          </a>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </nav>
+      
+      <!-- Header Icons -->
+      <div class="header__icons flex items-center space-x-4">
+        <!-- Search -->
+        {% if section.settings.show_search %}
+          <button class="p-2 text-gray-700 hover:text-gray-900 transition-colors" aria-label="Search" data-search-toggle>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+        {% endif %}
+        
+        <!-- Account -->
+        {% if shop.customer_accounts_enabled %}
+          <a href="{{ routes.account_url }}" class="p-2 text-gray-700 hover:text-gray-900 transition-colors" aria-label="Account">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </a>
+        {% endif %}
+        
+        <!-- Cart -->
+        <a href="{{ routes.cart_url }}" class="p-2 text-gray-700 hover:text-gray-900 transition-colors relative" aria-label="Cart">
+          {% if cart.item_count > 0 %}
+            <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {{ cart.item_count }}
+            </span>
+          {% endif %}
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
   </div>
-  {% if section.settings.show_title %}
-    <h2 class="header__title">
-      {{ shop.name | link_to: routes.root_url }}
-    </h2>
+  
+  <!-- Mobile Menu -->
+  <div class="mobile-menu fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden opacity-0 invisible transition-all duration-300" data-mobile-menu>
+    <div class="mobile-menu__panel bg-white h-full w-80 max-w-[85vw] transform -translate-x-full transition-transform duration-300">
+      <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Menu</h2>
+        <button class="p-2" aria-label="Close menu" data-mobile-menu-close>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <nav class="p-4">
+        {% for link in section.settings.menu.links %}
+          <div class="mobile-menu__item mb-2">
+            {% if link.links.size > 0 %}
+              <button class="w-full text-left py-3 px-4 text-gray-700 font-medium flex items-center justify-between hover:bg-gray-50 rounded-lg transition-colors"
+                      data-mobile-submenu-toggle>
+                {{ link.title }}
+                <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+              <div class="mobile-submenu hidden pl-4">
+                {% for childlink in link.links %}
+                  <a href="{{ childlink.url }}" class="block py-2 px-4 text-gray-600 hover:text-gray-900">
+                    {{ childlink.title }}
+                  </a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <a href="{{ link.url }}" class="block py-3 px-4 text-gray-700 font-medium hover:bg-gray-50 rounded-lg transition-colors">
+                {{ link.title }}
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </nav>
+    </div>
+  </div>
+  
+  <!-- Search Overlay -->
+  {% if section.settings.show_search %}
+    <div class="search-overlay fixed inset-0 bg-black bg-opacity-50 z-50 opacity-0 invisible transition-all duration-300" data-search-overlay>
+      <div class="container mx-auto px-4 pt-20">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl mx-auto transform -translate-y-10 transition-transform duration-300" data-search-panel>
+          <form action="{{ routes.search_url }}" method="get" class="relative">
+            <input type="search" 
+                   name="q" 
+                   placeholder="Search products..." 
+                   class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
+                   autocomplete="off"
+                   data-search-input>
+            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </form>
+          <button class="absolute top-4 right-4 p-2" data-search-close>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
   {% endif %}
-
-
-  <div class="header__icons">
-    {% if shop.customer_accounts_enabled %}
-      {{ 'icon-account.svg' | inline_asset_content | link_to: routes.account_url }}
-    {% endif %}
-
-    <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
-      {% endif %}
-
-      {{ 'icon-cart.svg' | inline_asset_content }}
-    </a>
-  </div>
 </header>
 
-{% stylesheet %}
-  header {
-    height: 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
+<style>
+  .header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 101;
-    width: 100%;
-    background-color: var(--color-background);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 40;
+    background-color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
   }
-  header a {
-    position: relative;
-    text-decoration: none;
-    color: var(--color-foreground);
+  
+  .header.header--hidden {
+    transform: translateY(-100%);
   }
-  header a sup {
-    position: absolute;
-    left: 100%;
+  
+  .mega-menu {
+    z-index: 50;
+  }
+  
+  .mobile-menu.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .mobile-menu.active .mobile-menu__panel {
+    transform: translateX(0);
+  }
+  
+  .search-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .search-overlay.active [data-search-panel] {
+    transform: translateY(0);
+  }
+  
+  body.menu-open,
+  body.search-open {
     overflow: hidden;
-    max-width: var(--page-margin);
   }
-  header svg {
-    width: 2rem;
+  
+  /* Smooth animations for dropdowns */
+  @media (min-width: 768px) {
+    .group:hover .mega-menu {
+      animation: fadeInUp 0.3s ease-out;
+    }
   }
-  header .header__menu,
-  header .header__icons {
-    display: flex;
-    gap: 1rem;
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-{% endstylesheet %}
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const header = document.querySelector('[data-header]');
+    const mobileMenuToggle = document.querySelector('[data-mobile-menu-toggle]');
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    const mobileMenuClose = document.querySelector('[data-mobile-menu-close]');
+    const mobileSubmenuToggles = document.querySelectorAll('[data-mobile-submenu-toggle]');
+    const searchToggle = document.querySelector('[data-search-toggle]');
+    const searchOverlay = document.querySelector('[data-search-overlay]');
+    const searchClose = document.querySelector('[data-search-close]');
+    const searchInput = document.querySelector('[data-search-input]');
+    
+    // Sticky header on scroll
+    {% if section.settings.sticky_header %}
+      let lastScrollTop = 0;
+      window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+          header.classList.add('header--hidden');
+        } else {
+          header.classList.remove('header--hidden');
+        }
+        
+        lastScrollTop = scrollTop;
+      });
+    {% endif %}
+    
+    // Mobile menu
+    if (mobileMenuToggle && mobileMenu) {
+      mobileMenuToggle.addEventListener('click', function() {
+        mobileMenu.classList.add('active');
+        document.body.classList.add('menu-open');
+      });
+      
+      mobileMenuClose.addEventListener('click', closeMobileMenu);
+      mobileMenu.addEventListener('click', function(e) {
+        if (e.target === mobileMenu) {
+          closeMobileMenu();
+        }
+      });
+      
+      function closeMobileMenu() {
+        mobileMenu.classList.remove('active');
+        document.body.classList.remove('menu-open');
+      }
+      
+      // Mobile submenu toggles
+      mobileSubmenuToggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+          const submenu = toggle.nextElementSibling;
+          const arrow = toggle.querySelector('svg');
+          
+          submenu.classList.toggle('hidden');
+          arrow.classList.toggle('rotate-90');
+        });
+      });
+    }
+    
+    // Search overlay
+    if (searchToggle && searchOverlay) {
+      searchToggle.addEventListener('click', function() {
+        searchOverlay.classList.add('active');
+        document.body.classList.add('search-open');
+        setTimeout(function() {
+          searchInput.focus();
+        }, 300);
+      });
+      
+      searchClose.addEventListener('click', closeSearch);
+      searchOverlay.addEventListener('click', function(e) {
+        if (e.target === searchOverlay) {
+          closeSearch();
+        }
+      });
+      
+      function closeSearch() {
+        searchOverlay.classList.remove('active');
+        document.body.classList.remove('search-open');
+      }
+      
+      // Close on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeSearch();
+          closeMobileMenu();
+        }
+      });
+    }
+  });
+</script>
 
 {% schema %}
 {
-  "name": "t:general.header",
+  "name": "Header",
   "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
     {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
+      "label": "Main Menu",
+      "default": "main-menu"
     },
     {
       "type": "checkbox",
-      "id": "show_title",
-      "label": "Show title",
+      "id": "sticky_header",
+      "label": "Enable Sticky Header",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Header",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show Search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured_in_menu",
+      "label": "Show Featured Products in Menu",
+      "default": true,
+      "info": "Shows featured products in the Shop dropdown"
     }
   ]
 }

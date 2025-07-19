@@ -10,52 +10,322 @@
         "link_text": "Shop Now"
       }
     },
-    "hello-world": {
-      "type": "hello-world",
-      "settings": {}
-    },
-    "collections": {
-      "type": "collections",
-      "settings": {}
-    },
-    "hero": {
-      "type": "hero",
+    "slideshow": {
+      "type": "slideshow",
       "settings": {
-        "subtitle": "Welcome to our store",
-        "heading": "Discover Amazing Products",
-        "description": "<p>Shop our curated collection of premium products designed to enhance your lifestyle.</p>",
-        "button_text": "Shop Now",
-        "button_link": "/collections/all",
-        "secondary_button_text": "Learn More",
-        "secondary_button_link": "/pages/about",
+        "full_width": true,
+        "height": "full",
+        "autoplay": true,
+        "autoplay_speed": 5,
+        "show_arrows": true,
+        "show_dots": true,
         "overlay_color": "#000000",
         "overlay_opacity": 30,
-        "height": "large",
-        "text_alignment": "center"
-      }
-    },
-    "grid-product": {
-      "type": "grid-product",
-      "settings": {
-        "show_section": true,
-        "title": "Our Gallery"
+        "text_color": "light"
       },
       "blocks": {
-        "image-1": {
-          "type": "image"
+        "slide1": {
+          "type": "slide",
+          "settings": {
+            "heading": "Welcome to Our Store",
+            "subheading": "Discover Amazing Products",
+            "description": "Shop our curated collection of premium products designed to enhance your lifestyle.",
+            "button_text": "Shop Now",
+            "button_link": "/collections/all",
+            "button_style": "primary",
+            "text_alignment": "center",
+            "vertical_alignment": "middle"
+          }
         },
-        "image-2": {
-          "type": "image"
+        "slide2": {
+          "type": "slide",
+          "settings": {
+            "heading": "New Collection",
+            "subheading": "Spring 2024",
+            "description": "Explore our latest arrivals and trending styles.",
+            "button_text": "View Collection",
+            "button_link": "/collections/new-arrivals",
+            "button_style": "secondary",
+            "text_alignment": "left",
+            "vertical_alignment": "middle"
+          }
         },
-        "image-3": {
-          "type": "image"
-        },
-        "image-4": {
-          "type": "image"
+        "slide3": {
+          "type": "slide",
+          "settings": {
+            "heading": "Special Offer",
+            "subheading": "Limited Time",
+            "description": "Get 20% off on selected items. Don't miss out!",
+            "button_text": "Shop Sale",
+            "button_link": "/collections/sale",
+            "button_style": "accent",
+            "text_alignment": "center",
+            "vertical_alignment": "middle"
+          }
         }
       },
-      "block_order": ["image-1", "image-2", "image-3", "image-4"]
+      "block_order": ["slide1", "slide2", "slide3"]
+    },
+    "service-boxes": {
+      "type": "service-boxes",
+      "settings": {
+        "title": "Why Choose Us",
+        "subtitle": "We provide the best shopping experience with these amazing features",
+        "columns": "4",
+        "text_alignment": "center",
+        "box_style": "shadow",
+        "show_hover_effect": true
+      },
+      "blocks": {
+        "service1": {
+          "type": "service",
+          "settings": {
+            "icon_type": "svg",
+            "svg_icon": "truck",
+            "icon_background_color": "blue-100",
+            "icon_color": "blue-600",
+            "title": "Free Shipping",
+            "description": "Free shipping on all orders over $50. No minimum purchase required for members."
+          }
+        },
+        "service2": {
+          "type": "service",
+          "settings": {
+            "icon_type": "svg",
+            "svg_icon": "support",
+            "icon_background_color": "green-100",
+            "icon_color": "green-600",
+            "title": "24/7 Support",
+            "description": "Our customer support team is here to help you round the clock."
+          }
+        },
+        "service3": {
+          "type": "service",
+          "settings": {
+            "icon_type": "svg",
+            "svg_icon": "shield",
+            "icon_background_color": "purple-100",
+            "icon_color": "purple-600",
+            "title": "Secure Payment",
+            "description": "Your payment information is safe with our secure checkout process."
+          }
+        },
+        "service4": {
+          "type": "service",
+          "settings": {
+            "icon_type": "svg",
+            "svg_icon": "gift",
+            "icon_background_color": "red-100",
+            "icon_color": "red-600",
+            "title": "Gift Cards",
+            "description": "Perfect gifts for any occasion. Available in multiple denominations."
+          }
+        }
+      },
+      "block_order": ["service1", "service2", "service3", "service4"]
+    },
+    "collection-tabs": {
+      "type": "collection-tabs",
+      "settings": {
+        "show_section": true,
+        "title": "Shop by Category",
+        "products_limit": 8,
+        "products_per_row_desktop": 4,
+        "products_per_row_tablet": 3,
+        "products_per_row_mobile": 2,
+        "show_badges": true,
+        "show_quick_add": true
+      },
+      "blocks": {
+        "tab1": {
+          "type": "collection_tab",
+          "settings": {
+            "collection": "all",
+            "tab_title": "All Products"
+          }
+        },
+        "tab2": {
+          "type": "collection_tab",
+          "settings": {
+            "collection": "frontpage",
+            "tab_title": "Featured"
+          }
+        },
+        "tab3": {
+          "type": "collection_tab",
+          "settings": {
+            "collection": "new-arrivals",
+            "tab_title": "New Arrivals"
+          }
+        }
+      },
+      "block_order": ["tab1", "tab2", "tab3"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "title": "What Our Customers Say",
+        "subtitle": "Real reviews from real customers",
+        "full_width": false,
+        "enable_autoplay": true,
+        "autoplay_speed": 5,
+        "enable_loop": true,
+        "transition_effect": "slide"
+      },
+      "blocks": {
+        "testimonial1": {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_text": "This is the best online shopping experience I've had! The products are high quality and shipping was incredibly fast.",
+            "customer_name": "Sarah Johnson",
+            "customer_title": "Verified Buyer",
+            "star_rating": 5
+          }
+        },
+        "testimonial2": {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_text": "Excellent customer service and amazing products. I'm a repeat customer and will continue shopping here.",
+            "customer_name": "Michael Chen",
+            "customer_title": "Loyal Customer",
+            "star_rating": 5
+          }
+        },
+        "testimonial3": {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_text": "The quality exceeded my expectations. Great prices and the packaging was beautiful. Highly recommend!",
+            "customer_name": "Emma Davis",
+            "customer_title": "Happy Customer",
+            "star_rating": 5
+          }
+        }
+      },
+      "block_order": ["testimonial1", "testimonial2", "testimonial3"]
+    },
+    "video-box": {
+      "type": "video-box",
+      "settings": {
+        "title": "See Our Products in Action",
+        "subtitle": "Watch how our products can transform your daily routine",
+        "full_width": false,
+        "aspect_ratio": "16:9",
+        "video_type": "youtube",
+        "youtube_id": "dQw4w9WgXcQ",
+        "autoplay": false,
+        "autoplay_delay": 3
+      }
+    },
+    "brands": {
+      "type": "brands",
+      "settings": {
+        "title": "Our Partner Brands",
+        "subtitle": "Trusted by leading brands worldwide",
+        "full_width": false,
+        "background_color": "gray-50",
+        "brands_per_row": 5,
+        "enable_autoplay": true,
+        "autoplay_speed": 3,
+        "enable_loop": true
+      },
+      "blocks": {
+        "brand1": {
+          "type": "brand",
+          "settings": {
+            "brand_name": "Brand 1",
+            "open_new_tab": true
+          }
+        },
+        "brand2": {
+          "type": "brand",
+          "settings": {
+            "brand_name": "Brand 2",
+            "open_new_tab": true
+          }
+        },
+        "brand3": {
+          "type": "brand",
+          "settings": {
+            "brand_name": "Brand 3",
+            "open_new_tab": true
+          }
+        },
+        "brand4": {
+          "type": "brand",
+          "settings": {
+            "brand_name": "Brand 4",
+            "open_new_tab": true
+          }
+        },
+        "brand5": {
+          "type": "brand",
+          "settings": {
+            "brand_name": "Brand 5",
+            "open_new_tab": true
+          }
+        }
+      },
+      "block_order": ["brand1", "brand2", "brand3", "brand4", "brand5"]
+    },
+    "instagram-feed": {
+      "type": "instagram-feed",
+      "settings": {
+        "title": "Follow Us on Instagram",
+        "instagram_handle": "yourstore",
+        "full_width": false,
+        "feed_type": "manual",
+        "layout": "carousel",
+        "images_per_row": 5,
+        "show_follow_button": true
+      },
+      "blocks": {
+        "image1": {
+          "type": "instagram_image",
+          "settings": {
+            "caption": "Check out our latest collection! #fashion #style",
+            "show_overlay_icon": true
+          }
+        },
+        "image2": {
+          "type": "instagram_image",
+          "settings": {
+            "caption": "Behind the scenes at our photoshoot 📸",
+            "show_overlay_icon": true
+          }
+        },
+        "image3": {
+          "type": "instagram_image",
+          "settings": {
+            "caption": "New arrivals dropping soon! Stay tuned 🎉",
+            "show_overlay_icon": true
+          }
+        },
+        "image4": {
+          "type": "instagram_image",
+          "settings": {
+            "caption": "Customer style spotlight ✨",
+            "show_overlay_icon": true
+          }
+        },
+        "image5": {
+          "type": "instagram_image",
+          "settings": {
+            "caption": "Weekend vibes with our products 🌟",
+            "show_overlay_icon": true
+          }
+        }
+      },
+      "block_order": ["image1", "image2", "image3", "image4", "image5"]
     }
   },
-  "order": ["banner", "hero", "collections", "hello-world", "grid-product"]
+  "order": [
+    "banner",
+    "slideshow",
+    "service-boxes",
+    "collection-tabs",
+    "testimonials",
+    "video-box",
+    "brands",
+    "instagram-feed"
+  ]
 }

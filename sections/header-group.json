@@ -13,7 +13,13 @@
   "sections": {
     "header": {
       "type": "header",
-      "settings": {}
+      "settings": {
+        "sticky_header": true,
+        "full_width": false,
+        "show_search": true,
+        "show_featured_in_menu": true,
+        "menu": "main-menu"
+      }
     }
   },
   "order": [
