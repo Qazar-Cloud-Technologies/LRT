@@ -1,0 +1,351 @@
+{% comment %}
+  Instagram Feed Section
+  Displays Instagram posts in a carousel or grid layout
+{% endcomment %}
+
+<section class="instagram-feed-section py-12 md:py-16 {% if section.settings.background_color %}bg-{{ section.settings.background_color }}{% endif %}">
+  <div class="{% if section.settings.full_width %}w-full{% else %}container mx-auto{% endif %} px-4">
+    
+    {% if section.settings.title != blank or section.settings.instagram_handle != blank %}
+      <div class="text-center mb-8 md:mb-10">
+        {% if section.settings.title != blank %}
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            {{ section.settings.title }}
+          </h2>
+        {% endif %}
+        {% if section.settings.instagram_handle != blank %}
+          <a href="https://instagram.com/{{ section.settings.instagram_handle }}" 
+             target="_blank"
+             rel="noopener noreferrer"
+             class="inline-flex items-center text-lg text-gray-600 hover:text-gray-900 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+            </svg>
+            @{{ section.settings.instagram_handle }}
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="instagram-feed-container" data-instagram-feed>
+      {% if section.settings.feed_type == 'manual' %}
+        <!-- Manual Instagram Images -->
+        <div class="{% if section.settings.layout == 'carousel' %}instagram-carousel swiper-container{% else %}grid grid-cols-2 md:grid-cols-{{ section.settings.images_per_row }} gap-2 md:gap-4{% endif %}">
+          <div class="{% if section.settings.layout == 'carousel' %}swiper-wrapper{% else %}contents{% endif %}">
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'instagram_image' %}
+                  <div class="{% if section.settings.layout == 'carousel' %}swiper-slide{% endif %}" {{ block.shopify_attributes }}>
+                    <a href="{{ block.settings.link | default: '#' }}"
+                       {% if block.settings.link != blank %}target="_blank" rel="noopener noreferrer"{% endif %}
+                       class="instagram-item group relative block overflow-hidden rounded-lg bg-gray-100 aspect-square">
+                      {% if block.settings.image %}
+                        <img src="{{ block.settings.image | img_url: '400x400' }}"
+                             alt="{{ block.settings.caption | default: 'Instagram post' }}"
+                             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                             loading="lazy">
+                      {% endif %}
+                      
+                      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center p-4">
+                          {% if block.settings.show_overlay_icon %}
+                            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                            </svg>
+                          {% endif %}
+                          {% if block.settings.caption != blank %}
+                            <p class="text-sm line-clamp-3">{{ block.settings.caption }}</p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+              {% endcase %}
+            {% endfor %}
+          </div>
+          
+          {% if section.settings.layout == 'carousel' %}
+            <!-- Navigation arrows -->
+            <div class="swiper-button-prev !w-10 !h-10 !bg-white !rounded-full !shadow-lg after:!text-sm after:!text-gray-800"></div>
+            <div class="swiper-button-next !w-10 !h-10 !bg-white !rounded-full !shadow-lg after:!text-sm after:!text-gray-800"></div>
+          {% endif %}
+        </div>
+      {% else %}
+        <!-- Automatic Instagram Feed -->
+        <div class="instagram-automatic-feed text-center py-8">
+          <p class="text-gray-600 mb-4">
+            To display your Instagram feed automatically, install the
+            <a href="https://apps.shopify.com/instafeed" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="text-blue-600 hover:underline">
+              Instafeed app
+            </a>
+            and configure it with your Instagram account.
+          </p>
+          <div id="instafeed" class="grid grid-cols-2 md:grid-cols-{{ section.settings.images_per_row }} gap-2 md:gap-4"></div>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if section.settings.show_follow_button %}
+      <div class="text-center mt-8">
+        <a href="https://instagram.com/{{ section.settings.instagram_handle | default: 'instagram' }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+          </svg>
+          Follow on Instagram
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .instagram-item img {
+    will-change: transform;
+  }
+  
+  @media (max-width: 768px) {
+    .swiper-button-prev,
+    .swiper-button-next {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const feedContainer = document.querySelector('[data-instagram-feed]');
+    
+    {% if section.settings.layout == 'carousel' and section.settings.feed_type == 'manual' %}
+      // Initialize carousel for manual feed
+      const carousel = feedContainer.querySelector('.instagram-carousel');
+      
+      if (typeof Swiper === 'undefined') {
+        const swiperCSS = document.createElement('link');
+        swiperCSS.rel = 'stylesheet';
+        swiperCSS.href = 'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css';
+        document.head.appendChild(swiperCSS);
+        
+        const swiperJS = document.createElement('script');
+        swiperJS.src = 'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js';
+        swiperJS.onload = function() {
+          initInstagramCarousel(carousel);
+        };
+        document.head.appendChild(swiperJS);
+      } else {
+        initInstagramCarousel(carousel);
+      }
+      
+      function initInstagramCarousel(carousel) {
+        new Swiper(carousel, {
+          slidesPerView: 2,
+          spaceBetween: 10,
+          loop: true,
+          autoplay: {
+            delay: 3000,
+            disableOnInteraction: false
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+          },
+          breakpoints: {
+            640: {
+              slidesPerView: 3,
+              spaceBetween: 15
+            },
+            768: {
+              slidesPerView: 4,
+              spaceBetween: 20
+            },
+            1024: {
+              slidesPerView: {{ section.settings.images_per_row }},
+              spaceBetween: 20
+            }
+          }
+        });
+      }
+    {% endif %}
+    
+    {% if section.settings.feed_type == 'automatic' %}
+      // Initialize Instafeed if available
+      if (typeof Instafeed !== 'undefined') {
+        const feed = new Instafeed({
+          accessToken: '{{ section.settings.instagram_access_token }}',
+          limit: {{ section.settings.images_count }},
+          template: '<a href="{{link}}" target="_blank" rel="noopener noreferrer" class="instagram-item group relative block overflow-hidden rounded-lg bg-gray-100 aspect-square"><img src="{{image}}" alt="{{caption}}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy" /><div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300"></div></a>'
+        });
+        feed.run();
+      }
+    {% endif %}
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Instagram Feed",
+  "tag": "section",
+  "class": "instagram-feed-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Follow Us on Instagram"
+    },
+    {
+      "type": "text",
+      "id": "instagram_handle",
+      "label": "Instagram Handle",
+      "placeholder": "yourhandle",
+      "info": "Without the @ symbol"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "background_color",
+      "label": "Background Color",
+      "options": [
+        {
+          "value": "",
+          "label": "None"
+        },
+        {
+          "value": "gray-50",
+          "label": "Light Gray"
+        },
+        {
+          "value": "white",
+          "label": "White"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "feed_type",
+      "label": "Feed Type",
+      "options": [
+        {
+          "value": "manual",
+          "label": "Manual Images"
+        },
+        {
+          "value": "automatic",
+          "label": "Automatic Feed (Requires App)"
+        }
+      ],
+      "default": "manual"
+    },
+    {
+      "type": "text",
+      "id": "instagram_access_token",
+      "label": "Instagram Access Token",
+      "info": "Required for automatic feed. Get from Instagram Basic Display API"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "range",
+      "id": "images_per_row",
+      "label": "Images Per Row (Desktop)",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "images_count",
+      "label": "Number of Images",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "info": "For automatic feed only"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_follow_button",
+      "label": "Show Follow Button",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "instagram_image",
+      "name": "Instagram Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption",
+          "default": "Follow us on Instagram"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Instagram Post Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_overlay_icon",
+          "label": "Show Instagram Icon on Hover",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Instagram Feed",
+      "blocks": [
+        {
+          "type": "instagram_image"
+        },
+        {
+          "type": "instagram_image"
+        },
+        {
+          "type": "instagram_image"
+        },
+        {
+          "type": "instagram_image"
+        },
+        {
+          "type": "instagram_image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,285 @@
+{% comment %}
+  Video Box Section
+  Displays a video with play button overlay
+{% endcomment %}
+
+<section class="video-box-section py-12 md:py-16 {% if section.settings.full_width %}w-full{% else %}container mx-auto px-4{% endif %}">
+  
+  {% if section.settings.title != blank or section.settings.subtitle != blank %}
+    <div class="text-center mb-8 md:mb-12">
+      {% if section.settings.title != blank %}
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">
+          {{ section.settings.title }}
+        </h2>
+      {% endif %}
+      {% if section.settings.subtitle != blank %}
+        <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+          {{ section.settings.subtitle }}
+        </p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="video-container relative overflow-hidden rounded-lg shadow-xl {% if section.settings.aspect_ratio == '16:9' %}aspect-video{% elsif section.settings.aspect_ratio == '4:3' %}aspect-4/3{% elsif section.settings.aspect_ratio == '1:1' %}aspect-square{% endif %} bg-black">
+    
+    <!-- Video Preview/Thumbnail -->
+    <div class="video-preview absolute inset-0 cursor-pointer group" data-video-preview>
+      {% if section.settings.preview_image %}
+        <img src="{{ section.settings.preview_image | img_url: 'master' }}"
+             alt="{{ section.settings.title | default: 'Video preview' }}"
+             class="w-full h-full object-cover">
+      {% else %}
+        <div class="w-full h-full bg-gray-900 flex items-center justify-center">
+          <p class="text-white text-lg">Video Preview</p>
+        </div>
+      {% endif %}
+      
+      <!-- Play Button Overlay -->
+      <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center transition-all duration-300 group-hover:bg-opacity-40">
+        <button class="play-button bg-white bg-opacity-90 rounded-full p-6 md:p-8 transform transition-all duration-300 hover:scale-110 hover:bg-opacity-100 shadow-lg"
+                aria-label="Play video">
+          <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Video Player (Hidden Initially) -->
+    <div class="video-player hidden absolute inset-0" data-video-player>
+      {% if section.settings.video_type == 'youtube' %}
+        <div class="youtube-player w-full h-full" data-youtube-id="{{ section.settings.youtube_id }}"></div>
+      {% elsif section.settings.video_type == 'vimeo' %}
+        <div class="vimeo-player w-full h-full" data-vimeo-id="{{ section.settings.vimeo_id }}"></div>
+      {% elsif section.settings.video_type == 'mp4' and section.settings.mp4_url != blank %}
+        <video class="w-full h-full" 
+               controls 
+               {% if section.settings.autoplay %}autoplay{% endif %}
+               {% if section.settings.loop %}loop{% endif %}
+               {% if section.settings.muted or section.settings.autoplay %}muted{% endif %}>
+          <source src="{{ section.settings.mp4_url }}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if section.settings.description != blank %}
+    <div class="mt-8 text-center max-w-3xl mx-auto">
+      <div class="text-gray-600 prose prose-lg mx-auto">
+        {{ section.settings.description }}
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+<style>
+  .play-button {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.9;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+  
+  .aspect-4\/3 {
+    aspect-ratio: 4 / 3;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const videoContainer = document.querySelector('.video-container');
+    const videoPreview = videoContainer.querySelector('[data-video-preview]');
+    const videoPlayer = videoContainer.querySelector('[data-video-player]');
+    
+    if (!videoPreview || !videoPlayer) return;
+    
+    videoPreview.addEventListener('click', function() {
+      videoPreview.classList.add('hidden');
+      videoPlayer.classList.remove('hidden');
+      
+      {% if section.settings.video_type == 'youtube' %}
+        const youtubeId = '{{ section.settings.youtube_id }}';
+        const youtubeContainer = videoPlayer.querySelector('.youtube-player');
+        
+        // Create YouTube iframe
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1`;
+        iframe.width = '100%';
+        iframe.height = '100%';
+        iframe.frameBorder = '0';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        
+        youtubeContainer.appendChild(iframe);
+        
+      {% elsif section.settings.video_type == 'vimeo' %}
+        const vimeoId = '{{ section.settings.vimeo_id }}';
+        const vimeoContainer = videoPlayer.querySelector('.vimeo-player');
+        
+        // Create Vimeo iframe
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&title=0&byline=0&portrait=0`;
+        iframe.width = '100%';
+        iframe.height = '100%';
+        iframe.frameBorder = '0';
+        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+        iframe.allowFullscreen = true;
+        
+        vimeoContainer.appendChild(iframe);
+        
+      {% elsif section.settings.video_type == 'mp4' %}
+        const video = videoPlayer.querySelector('video');
+        if (video) {
+          video.play();
+        }
+      {% endif %}
+    });
+    
+    // Auto-play functionality
+    {% if section.settings.autoplay and section.settings.video_type != 'mp4' %}
+      setTimeout(function() {
+        videoPreview.click();
+      }, {{ section.settings.autoplay_delay | times: 1000 }});
+    {% endif %}
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Video Box",
+  "tag": "section",
+  "class": "video-box-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Section Subtitle"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "info": "Additional text below the video"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width Section",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Video Aspect Ratio",
+      "options": [
+        {
+          "value": "16:9",
+          "label": "16:9 (Widescreen)"
+        },
+        {
+          "value": "4:3",
+          "label": "4:3 (Standard)"
+        },
+        {
+          "value": "1:1",
+          "label": "1:1 (Square)"
+        }
+      ],
+      "default": "16:9"
+    },
+    {
+      "type": "select",
+      "id": "video_type",
+      "label": "Video Type",
+      "options": [
+        {
+          "value": "youtube",
+          "label": "YouTube"
+        },
+        {
+          "value": "vimeo",
+          "label": "Vimeo"
+        },
+        {
+          "value": "mp4",
+          "label": "MP4 Upload"
+        }
+      ],
+      "default": "youtube"
+    },
+    {
+      "type": "text",
+      "id": "youtube_id",
+      "label": "YouTube Video ID",
+      "info": "The ID from the YouTube URL (e.g., 'dQw4w9WgXcQ' from 'youtube.com/watch?v=dQw4w9WgXcQ')"
+    },
+    {
+      "type": "text",
+      "id": "vimeo_id",
+      "label": "Vimeo Video ID",
+      "info": "The ID from the Vimeo URL (e.g., '123456789' from 'vimeo.com/123456789')"
+    },
+    {
+      "type": "text",
+      "id": "mp4_url",
+      "label": "MP4 Video URL",
+      "info": "Direct URL to the MP4 video file"
+    },
+    {
+      "type": "image_picker",
+      "id": "preview_image",
+      "label": "Preview Image",
+      "info": "Thumbnail image shown before video plays"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto-play Video",
+      "default": false,
+      "info": "Note: Most browsers require videos to be muted for autoplay"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "label": "Auto-play Delay",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 3,
+      "unit": "s",
+      "info": "Delay before auto-playing (if enabled)"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop Video",
+      "default": false,
+      "info": "Only applies to MP4 videos"
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Mute Video",
+      "default": false,
+      "info": "Only applies to MP4 videos"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video Box"
+    }
+  ]
+}
+{% endschema %}
