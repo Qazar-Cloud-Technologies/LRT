@@ -17,12 +17,7 @@
           
           {% if block.settings.image != blank %}
             <div class="slideshow__image-container">
-              {% render 'image', 
-                image: block.settings.image,
-                class: 'slideshow__image',
-                sizes: '100vw',
-                loading: forloop.first ? 'eager' : 'lazy'
-              %}
+              {% render 'image', image: block.settings.image, class: 'slideshow__image', sizes: '100vw', loading: forloop.first %}
             </div>
           {% endif %}
 
@@ -741,4 +736,16 @@
     }
   ]
 }
-{% endschema %}
+{% endschema %}{%- comment -%}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% render 'image', \r\n                image: block.settings.image,\r\n                class:
+    'slideshow__image',\r\n                sizes: '100vw',\r\n                loading:
+    forloop.first ? 'eager' : 'lazy'\r\n              %}"
+  to: "{% render 'image', image: block.settings.image, class: 'slideshow__image',
+    sizes: '100vw', loading: forloop.first %}"
+  position: 1033..1149
+{%- endcomment -%}

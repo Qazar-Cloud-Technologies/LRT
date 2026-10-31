@@ -20,12 +20,7 @@
           <!-- Slide Image -->
           {% if block.settings.image != blank %}
             <div class="absolute inset-0 w-full h-full">
-              {% render 'image', 
-                image: block.settings.image,
-                class: 'w-full h-full object-cover',
-                sizes: '100vw',
-                loading: forloop.first ? 'eager' : 'lazy'
-              %}
+              {% render 'image', image: block.settings.image, class: 'w-full h-full object-cover', sizes: '100vw', loading: forloop.first %}
               <!-- Ken Burns Animation -->
               <div class="absolute inset-0 w-full h-full {% if forloop.first %}ken-burns{% endif %}"></div>
             </div>
@@ -558,4 +553,16 @@
     }
   ]
 }
-{% endschema %}
+{% endschema %}{%- comment -%}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% render 'image', \r\n                image: block.settings.image,\r\n                class:
+    'w-full h-full object-cover',\r\n                sizes: '100vw',\r\n                loading:
+    forloop.first ? 'eager' : 'lazy'\r\n              %}"
+  to: "{% render 'image', image: block.settings.image, class: 'w-full h-full object-cover',
+    sizes: '100vw', loading: forloop.first %}"
+  position: 1130..1256
+{%- endcomment -%}
